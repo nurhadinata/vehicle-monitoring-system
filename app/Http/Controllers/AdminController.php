@@ -20,13 +20,14 @@ class AdminController extends Controller
      */
     public function index()
     {
+        $usageStatus = ["On Request", "Request Accepted", "Running"];
         $data = [
             'vehicle_counter' => 1,
-            'vehicle' => Vehicles::all(),
+            'vehicle' => Vehicles::orderBy('id', 'ASC')->paginate(5, ['*'], 'vehicle'),
             'driver_counter' => 1,
-            'driver' => Driver::all(),
+            'driver' => Driver::orderBy('id', 'ASC')->paginate(5, ['*'], 'driver'),
             'usage_counter' =>1,
-            'usage_record' => UsageRecord::all(),
+            'usage_record' => UsageRecord::orderBy('updated_at', 'DESC')->whereIn('status', $usageStatus)->paginate(5, ['*'], 'record'),
         ];
         return view('admin-dashboard', $data);
     }

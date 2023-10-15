@@ -54,7 +54,10 @@ Route::prefix('/usage-record')->group(function(){
     Route::get('/finished/{id}',[UsageRecordController::class, 'finishUsage'])->name('usage-record.finish-usage');
     Route::post('/finished/{id}',[UsageRecordController::class, 'finished'])->name('usage-record.finished');
     Route::get('/export', [UsageRecordController::class, 'export'])->name('usage-record.export');
-    Route::get('record-chart/',[UsageRecordController::class, 'recordChart'])->name('usage-record.chart');
+    Route::get('/record-chart',[UsageRecordController::class, 'recordChart'])->name('usage-record.chart');
+    Route::get('/cancel-request/{id}',[UsageRecordController::class, 'cancelRequest'])->name('usage-record.cancel-request');
+    Route::get('/confirm-request/{id}',[UsageRecordController::class, 'confirmRequest'])->name('usage-record.confirm-request');
+    Route::get('/record',[UsageRecordController::class, 'index'])->name(('usage-record.record'));
 });
 
 

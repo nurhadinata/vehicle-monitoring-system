@@ -13,11 +13,11 @@ class ManagerController extends Controller
     {
         $data = [
             'vehicle_counter' => 1,
-            'vehicle' => Vehicles::all(),
+            'vehicle' => Vehicles::orderBy('id', 'ASC')->paginate(5, ['*'], 'vehicle'),
             'driver_counter' => 1,
-            'driver' => Driver::all(),
+            'driver' => Driver::orderBy('id', 'ASC')->paginate(5, ['*'], 'driver'),
             'usage_counter' =>1,
-            'usage_record' => UsageRecord::all()->where('status', 'On Request'),
+            'usage_record' => UsageRecord::orderBy('updated_at', 'DESC')->where('status', 'On Request')->get(),
         ];
         return view('manager-dashboard', $data);
     }

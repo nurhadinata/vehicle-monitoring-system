@@ -37,6 +37,9 @@ use Illuminate\Support\Facades\URL;
 
         </tbody>
     </table>
+    <div>
+        {!! $vehicle->appends(['driver' => $driver->currentPage()])->links('pagination::bootstrap-5') !!}
+    </div>
 
     <div class="container">
         <div class="row">
@@ -66,11 +69,14 @@ use Illuminate\Support\Facades\URL;
 
         </tbody>
     </table>
+    <div>
+        {!! $driver->appends(['vehicle' => $vehicle->currentPage()])->links('pagination::bootstrap-5') !!}
+    </div>
 
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <h4>Data Request Kendaraan</h4>
+                <h4>Request Kendaraan</h4>
             </div>
         </div>
     </div>

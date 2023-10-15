@@ -13,8 +13,12 @@ use Illuminate\Support\Facades\URL;
                 <h4>Data Kendaraan</h4>
             </div>
             <div class="col-8 justify-content-end justify-item-end d-flex pb-2">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-add-vehicle-lg">Tambah Data</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-add-vehicle-lg">Tambah Data</button>
             </div>
+            <ul class="pagination pagination-sm">
+                
+            </ul>
+            
         </div>
     </div>
     <table class="table table-striped">
@@ -36,14 +40,21 @@ use Illuminate\Support\Facades\URL;
                 <td class="text-center">{{$value->registration_number}}</td>
                 <td class="text-center">{{$value->status}}</td>
                 <td class="inline-block text-center">
-                    <a href="{{route('usage-record.request-form', $value->id)}}"><button class="btn bg-success btn-primary">Request</button></a>
+                    <?php if($value->status == "Available"){ ?>
+                        <a href="{{route('usage-record.request-form', $value->id)}}"><button class="btn bg-success btn-primary">Request</button></a>
+                    <?php } ?>         
                 </td>
                 </tr>
                 {{-- @endif --}}
             @endforeach
+            
+
 
         </tbody>
     </table>
+    <div>
+        {!! $vehicle->appends(['driver' => $driver->currentPage(), 'record' => $usage_record->currentPage()])->links('pagination::bootstrap-5') !!}
+    </div>
 
     <div class="container">
         <div class="row">
@@ -76,16 +87,14 @@ use Illuminate\Support\Facades\URL;
 
         </tbody>
     </table>
+    <div>
+        {!! $driver->appends(['vehicle' => $vehicle->currentPage(), 'record' => $usage_record->currentPage()])->links('pagination::bootstrap-5') !!}
+    </div>
 
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <h4>Data Penggunaan Kendaraan</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-4">
-                <a href="{{route('usage-record.export')}}"><button class="btn bg-success btn-primary">Download Data</button></a>
+                <h4>Data Request Kendaraan</h4>
             </div>
         </div>
     </div>
@@ -96,7 +105,7 @@ use Illuminate\Support\Facades\URL;
                 <th scope="col" class="text-center">Nama Driver</th>
                 <th scope="col" class="text-center">Kendaraan</th>
                 <th scope="col" class="text-center">Status</th>
-                <th scope="col" class="text-center">Update Status</th>
+                <th scope="col" class="text-center">Aksi</th>
 
             </tr>
         </thead>
@@ -109,7 +118,14 @@ use Illuminate\Support\Facades\URL;
                 <td class="text-center">{{$value->vehicle->model}} : {{$value->vehicle->registration_number}}</td>
                 <td class="text-center">{{$value->status}}</td>
                 <td class="inline-block text-center">
-                    <a href="{{route('usage-record.finish-usage', $value->id)}}"><button class="btn bg-success btn-primary">Finish Usage</button></a>
+                    <?php if ( $value->status == "Request Accepted" ) { ?> 
+                        <a href="{{route('usage-record.confirm-request', $value->id)}}"><button class="btn bg-success btn-primary">Confirm Request</button></a>
+                        <a href="{{route('usage-record.cancel-request', $value->id)}}"><button class="btn bg-danger btn-primary">Cancel Request</button></a> 
+                    <?php }else if($value->status == "On Request"){ ?>
+                        <a href="{{route('usage-record.cancel-request', $value->id)}}"><button class="btn bg-danger btn-primary">Cancel Request</button></a>
+                    <?php }else if($value->status == "Running"){ ?>
+                        <a href="{{route('usage-record.finish-usage', $value->id)}}"><button class="btn bg-success btn-primary">Finish Usage</button></a>
+                    <?php } ?>
                 </td>
         
                 </tr>
@@ -119,6 +135,9 @@ use Illuminate\Support\Facades\URL;
 
         </tbody>
     </table>
+    <div>
+        {!! $usage_record->appends(['vehicle' => $vehicle->currentPage(), 'driver' => $driver->currentPage()])->links('pagination::bootstrap-5') !!}
+    </div>
 </div>
 
 <div class="modal fade bd-add-vehicle-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">

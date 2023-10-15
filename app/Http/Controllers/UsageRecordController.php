@@ -19,7 +19,11 @@ class UsageRecordController extends Controller
      */
     public function index()
     {
-        //
+        $data = [
+            'usage_counter' =>1,
+            'usage_record' => UsageRecord::orderBy('updated_at', 'ASC')->paginate(10, ['*'], 'record'),
+        ];
+        return view('record', $data);
     }
 
     /**
@@ -74,7 +78,7 @@ class UsageRecordController extends Controller
     {
         $data = [
             'vehicle' => Vehicles::find($id),
-            'driver' => Driver::all(),
+            'driver' => Driver::orderBy('id', 'ASC')->get(),
         ];
         return view('request-vehicle', $data)->render();
     }
@@ -95,9 +99,15 @@ class UsageRecordController extends Controller
 
         $vehicleId = $request->vehicle_id;
         $vehicle = Vehicles::find($vehicleId);
-        $vehicle->id = $vehicleId;
+        $vehicle->id = $request->vehicle_id;
         $vehicle->status = "Requested";
         $vehicle->save();
+
+        $driverId = $request->driver_id;
+        $driver = Driver::find($driverId);
+        $driver->id = $driverId;
+        $driver->status = "Waiting";
+        $driver->save();
 
         return redirect()->route('admin')
                         ->with('success','Input data sukses');
@@ -112,11 +122,43 @@ class UsageRecordController extends Controller
         return view('request-list', $data);
     }
 
+    public function cancelRequest($id)
+    {
+        $usageRecord = UsageRecord::find($id);
+        $usageRecord->id = $id;
+        $usageRecord->status = "Request Cancelled";
+        $usageRecord->save();
+
+        $vehicleId = $usageRecord->vehicle_id;
+        $vehicle = Vehicles::find($vehicleId);
+        $vehicle->id = $vehicleId;
+        $vehicle->status = "Available";
+        $vehicle->save();
+
+        return redirect()->back()->with('success', 'Request Cancelled');
+    }
+
     public function acceptRequest($id)
     {
         $usageRecord = UsageRecord::find($id);
         $usageRecord->id = $id;
         $usageRecord->status = "Request Accepted";
+        $usageRecord->save();
+
+        $vehicleId = $usageRecord->vehicle_id;
+        $vehicle = Vehicles::find($vehicleId);
+        $vehicle->id = $vehicleId;
+        $vehicle->status = "Ready to Use";
+        $vehicle->save();
+
+        return redirect()->back()->with('success', 'Request Accepted');
+    }
+
+    public function confirmRequest($id)
+    {
+        $usageRecord = UsageRecord::find($id);
+        $usageRecord->id = $id;
+        $usageRecord->status = "Running";
         $usageRecord->start_time = Carbon::now();
         $usageRecord->save();
 
@@ -128,10 +170,11 @@ class UsageRecordController extends Controller
 
         $driverId = $usageRecord->driver_id;
         $driver = Driver::find($driverId);
+        $driver->id = $driverId;
         $driver->status = "On Road";
         $driver->save();
 
-        return redirect()->back()->with('success', 'Request Accepted');
+        return redirect()->back()->with('success', 'Request Confirmed');
     }
 
     public function finishUsage($id)
@@ -154,6 +197,7 @@ class UsageRecordController extends Controller
 
         $driverId = $usageRecord->driver_id;
         $driver = Driver::find($driverId);
+        $driver->id = $driverId;
         $driver->status = "Idle";
         $driver->save();
 
